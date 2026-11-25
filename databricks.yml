@@ -1,0 +1,39 @@
+# Optional CLI deployment (see README → "Option B: deploy with the Databricks CLI").
+#   databricks bundle deploy --profile <your-profile> --var sql_warehouse_id=<your-warehouse-id>
+bundle:
+  name: whats-new-app
+
+variables:
+  sql_warehouse_id:
+    description: ID of the SQL warehouse the app queries through
+  table_name:
+    description: Fully-qualified shared table the app reads
+    default: whats_new_share.whats_new.whats_new_last_month
+
+resources:
+  apps:
+    app:
+      name: whats-new
+      description: "Browse new Azure Databricks features by category, with descriptions and docs links"
+      source_code_path: ./
+      lifecycle:
+        started: true
+      config:
+        command: ['npm', 'run', 'start']
+        env:
+          - name: DATABRICKS_WAREHOUSE_ID
+            value_from: sql-warehouse
+          - name: WHATS_NEW_TABLE
+            value: ${var.table_name}
+      resources:
+        - name: sql-warehouse
+          sql_warehouse:
+            id: ${var.sql_warehouse_id}
+            permission: CAN_USE
+
+targets:
+  default:
+    default: true
+    mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}

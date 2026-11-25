@@ -1,0 +1,7 @@
+command: ['npm', 'run', 'start']
+env:
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: sql-warehouse
+  # The shared table this app reads. Keep as-is if you named the shared catalog `whats_new_share`.
+  - name: WHATS_NEW_TABLE
+    value: whats_new_share.whats_new.whats_new_last_month
